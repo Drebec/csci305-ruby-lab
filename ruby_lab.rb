@@ -10,10 +10,9 @@
 ###############################################################
 
 $bigrams = Hash.new # The Bigram data structure
-$name = "Drew Beck"
-$counter = 0
+$name = "Drew Beck" # Me
 
-# function to process each line of a file and extract the song titles
+# Function to process each line of a file and extract the song titles
 def process_file(file_name)
 	puts "Processing File.... "
 
@@ -21,32 +20,29 @@ def process_file(file_name)
 		IO.foreach(file_name) do |line|
 			line.force_encoding 'utf-8'	# This forces every line to be interpreted as utf-8. Solution found with the help of stack overflow
 																	# thread https://stackoverflow.com/questions/17022394/how-to-convert-a-string-to-utf8-in-ruby
-			noisy_title = line.sub(/.*>/, "")
-			punc_title = noisy_title.sub(/([\(\[\{\\\/_\-\:\"\`\+\=\*]|feat\.).*/, "")
-			#puts punc_title
-			#punc_title.force_encoding 'utf-8'
-			title = punc_title.gsub(/[?!.;&@%#|¿¡]/, "")
-			#puts foreign_title
+			noisy_title = line.sub(/.*>/, "")	# Remove all non-song title information
+			punc_title = noisy_title.sub(/([\(\[\{\\\/_\-\:\"\`\+\=\*]|feat\.).*/, "")	# remove punctuation
+			title = punc_title.gsub(/[?!.;&@%#|¿¡]/, "")	# Remove punctuation
 
 			regex = /^[\w\s']+\n/	# Matches only full titles containing no non-english characters ignoring spaces and '
 
-			#p title =~ regex
-			if title =~ regex
-				$counter += 1
-				title.downcase!
-				words = title.split(' ')
-				index = 0
-				words.each do |word|
-					if $bigrams[word] == nil
+			if title =~ regex	# Check if the title containts any non-english characters
+				title.downcase!	# Reduce case of title
+				words = title.split(' ')	# Separate words
+				index = 0	# Tracks the index of the current word. Used to ignore the last word of every song
+				words.each do |word|	# For each word
+					if $bigrams[word] == nil # If it doesn't already exist in the bigram, create a new entry for it and the following
+																	 # word and initialize the value to 1
 						$bigrams[word] = Hash.new
 						$bigrams[word][words[index+1]] = 1
-					elsif $bigrams[word][words[index+1]] == nil
+					elsif $bigrams[word][words[index+1]] == nil	# If the current word exists but the following word does not
+																											# create the entry and initialize the value to 1
 						$bigrams[word][words[index+1]] = 1
 					else
-						$bigrams[word][words[index+1]] += 1
+						$bigrams[word][words[index+1]] += 1	# If the entry already exists, increment the value
 					end # if $bigrams[word] == nil
-					index += 1
-					if index > words.length - 2
+					index += 1	# Increment the word index
+					if index > words.length - 2	# If the index is at the final word, stop the loop, thus ignoring the last word of each title
 						break
 					end # if index > words.length -2
 				end # do words.each
@@ -54,7 +50,6 @@ def process_file(file_name)
 		end # do IO.foreach
 
 		puts "Finished. Bigram model built.\n"
-		puts "#{$counter} song titles found"
 	rescue
 		STDERR.puts "Could not open file"
 		raise
@@ -62,9 +57,8 @@ def process_file(file_name)
 	end # rescue
 end # def
 
-def cleanup_title line
-	line.force_encoding 'utf-8'	# This forces every line to be interpreted as utf-8. Solution found with the help of stack overflow
-															# thread https://stackoverflow.com/questions/17022394/how-to-convert-a-string-to-utf8-in-ruby
+def cleanup_title line	# This method exists only for the rspec check.
+	line.force_encoding 'utf-8'
 	noisy_title = line.sub(/.*>/, "")
 	punc_title = noisy_title.sub(/([\(\[\{\\\/_\-\:\"\`\+\=\*]|feat\.).*/, "")
 	#puts punc_title
