@@ -18,44 +18,16 @@ def process_file(file_name)
 
 	begin
 		IO.foreach(file_name) do |line|
-			line.force_encoding 'utf-8'	# This forces every line to be interpreted as utf-8. Solution found with the help of stack overflow
-																	# thread https://stackoverflow.com/questions/17022394/how-to-convert-a-string-to-utf8-in-ruby
-			noisy_title = line.sub(/.*>/, "")	# Remove all non-song title information
-			punc_title = noisy_title.sub(/([\(\[\{\\\/_\-\:\"\`\+\=\*]|feat\.).*/, "")	# remove punctuation
-			title = punc_title.gsub(/[?!.;&@%#|¿¡]/, "")	# Remove punctuation
-
-			regex = /^[\w\s']+\n/	# Matches only full titles containing no non-english characters ignoring spaces and '
-
-			if title =~ regex	# Check if the title containts any non-english characters
-				title.downcase!	# Reduce case of title
-				words = title.split(' ')	# Separate words
-				index = 0	# Tracks the index of the current word. Used to ignore the last word of every song
-				words.each do |word|	# For each word
-					if $bigrams[word] == nil # If it doesn't already exist in the bigram, create a new entry for it and the following
-																	 # word and initialize the value to 1
-						$bigrams[word] = Hash.new
-						$bigrams[word][words[index+1]] = 1
-					elsif $bigrams[word][words[index+1]] == nil	# If the current word exists but the following word does not
-																											# create the entry and initialize the value to 1
-						$bigrams[word][words[index+1]] = 1
-					else
-						$bigrams[word][words[index+1]] += 1	# If the entry already exists, increment the value
-					end # if $bigrams[word] == nil
-					index += 1	# Increment the word index
-					if index > words.length - 2	# If the index is at the final word, stop the loop, thus ignoring the last word of each title
-						break
-					end # if index > words.length -2
-				end # do words.each
-			end # if title =~ regex
+			title = cleanup_title(line)
+			build_bigram(title)
 		end # do IO.foreach
-
 		puts "Finished. Bigram model built.\n"
-	rescue
+	rescue # begin
 		STDERR.puts "Could not open file"
 		raise
 		exit 4
 	end # rescue
-end # def
+end # def process_file
 
 def cleanup_title line	# This method exists only for the rspec check.
 	line.force_encoding 'utf-8'
@@ -76,22 +48,45 @@ def cleanup_title line	# This method exists only for the rspec check.
 	return title
 end # def cleanup_title str
 
+def build_bigram title
+	if title != nil	# Check if the title containts any non-english characters
+		title.downcase!	# Reduce case of title
+		words = title.split(' ')	# Separate words
+		index = 0	# Tracks the index of the current word. Used to ignore the last word of every song
+		words.each do |word|	# For each word
+			if $bigrams[word] == nil # If it doesn't already exist in the bigram, create a new entry for it and the following
+															 # word and initialize the value to 1
+				$bigrams[word] = Hash.new
+				$bigrams[word][words[index+1]] = 1
+			elsif $bigrams[word][words[index+1]] == nil	# If the current word exists but the following word does not
+																									# create the entry and initialize the value to 1
+				$bigrams[word][words[index+1]] = 1
+			else
+				$bigrams[word][words[index+1]] += 1	# If the entry already exists, increment the value
+			end # if $bigrams[word] == nil
+			index += 1	# Increment the word index
+			if index > words.length - 2	# If the index is at the final word, stop the loop, thus ignoring the last word of each title
+				break
+			end # if index > words.length -2
+		end # do words.each
+	end # if title =~ regex
+end # build_bigram str
+
 def mcw str
 	most_common_number = 0
 	most_common_word = ""
-
 	begin
 		$bigrams[str].keys.each do |key|
 			if $bigrams[str][key] > most_common_number
 				most_common_number = $bigrams[str][key]
 				most_common_word = key
-			end # if
-		end # do
+			end # if $bigrams[str][key] ? most_common_number
+		end # do $bigrams[str].keys.each
 		#puts "The most common word to follow '#{str}' is '#{most_common_word}'"
 		return most_common_word
 	rescue # begin
 	end # begin
-end # def
+end # def mcw str
 
 def create_title str
 	current = str
