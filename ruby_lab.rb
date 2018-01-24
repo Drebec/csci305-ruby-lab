@@ -88,6 +88,12 @@ def mcw str
 	end # begin
 end # def mcw str
 
+def get_random_word str
+	$bigrams[str].keys.each do |key|
+
+	end # do $bigrams[str].keys.each
+end # get_next_word str
+
 def create_title str
 	current = str
 	created_title = "#{current}"
