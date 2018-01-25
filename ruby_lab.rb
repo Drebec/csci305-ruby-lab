@@ -11,6 +11,7 @@
 
 $bigrams = Hash.new # The Bigram data structure
 $name = "Drew Beck" # Me
+$counter = 0	# Tracks each time a new valid song title is processes in the bigram
 
 # Function to process each line of a file and extract the song titles
 def process_file(file_name)
@@ -18,8 +19,8 @@ def process_file(file_name)
 
 	begin
 		IO.foreach(file_name) do |line|
-			title = cleanup_title(line)
-			build_bigram(title)
+			title = cleanup_title(line)	# Removes unwanted text and sets string to downcase
+			build_bigram(title)	# Builds the bigram structure
 		end # do IO.foreach
 		puts "Finished. Bigram model built.\n"
 	rescue # begin
@@ -29,28 +30,26 @@ def process_file(file_name)
 	end # rescue
 end # def process_file
 
-def cleanup_title line	# This method exists only for the rspec check.
-	line.force_encoding 'utf-8'
-	noisy_title = line.sub(/.*>/, "")
-	punc_title = noisy_title.sub(/([\(\[\{\\\/_\-\:\"\`\+\=\*]|feat\.).*/, "")
-	#puts punc_title
-	#punc_title.force_encoding 'utf-8'
-	title = punc_title.gsub(/[?!.;&@%#|¿¡]/, "")
-	#puts foreign_title
+def cleanup_title line	# Function to pick off title, remove excess information, eliminate punctuation, filter non-English characters, and set string to downcase
+	line.force_encoding 'utf-8'	# Fixes encoding mismatch bug, solution derived from stack overflow https://stackoverflow.com/questions/17022394/how-to-convert-a-string-to-utf8-in-ruby
+	noisy_title = line.sub(/.*>/, "")	# Grabs only the song title
+	punc_title = noisy_title.sub(/([\(\[\{\\\/_\-\:\"\`\+\=\*]|feat\.).*/, "")	# Removes superfluous text
+	title = punc_title.gsub(/[?!.;&@%#|¿¡]/, "")	# => Removes punctuation
 
 	regex = /^[\w\s']+\n/	# Matches only full titles containing no non-english characters ignoring spaces and '
 
-	if title =~ regex
-		title.downcase!
+	if title =~ regex	# If the title contains any non-English characters, this will fail
+		title.downcase!	# Set to lowercase
 	else
-		title = nil
+		title = nil	# Remove titles containing non-English characters
 	end # if title =~ regex
-	return title
+	return title	# Return the fully processed title for use in the build_bigram method
 end # def cleanup_title str
 
-def build_bigram title
+def build_bigram title	# Populates the $bigrams hash
 	if title != nil	# Check if the title containts any non-english characters
 		title.downcase!	# Reduce case of title
+		$counter += 1	# A new valid song title is being processed
 		words = title.split(' ')	# Separate words
 		index = 0	# Tracks the index of the current word. Used to ignore the last word of every song
 		words.each do |word|	# For each word
@@ -72,19 +71,20 @@ def build_bigram title
 	end # if title =~ regex
 end # build_bigram str
 
-def mcw str
-	most_common_number = 0
+def mcw str	# Returns the most common word to follow the input str
+	most_common_number = 0	# Initialize
 	most_common_word = ""
 	begin
-		$bigrams[str].keys.each do |key|
-			if $bigrams[str][key] > most_common_number
-				most_common_number = $bigrams[str][key]
+		$bigrams[str].keys.each do |key|	# For each word to follow the input str
+			if $bigrams[str][key] > most_common_number	# If the occurrance of the following word is greater than the current max
+				most_common_number = $bigrams[str][key]		# Overwrite the current max and save the word
 				most_common_word = key
 			end # if $bigrams[str][key] ? most_common_number
 		end # do $bigrams[str].keys.each
-		#puts "The most common word to follow '#{str}' is '#{most_common_word}'"
-		return most_common_word
+		return most_common_word	# Return resulting most common following word
 	rescue # begin
+		return ""
+		# If the word doesn't exist in the bigram, do nothing
 	end # begin
 end # def mcw str
 
@@ -94,18 +94,16 @@ def get_random_word str
 	end # do $bigrams[str].keys.each
 end # get_next_word str
 
-def create_title str
-	current = str
-	created_title = "#{current}"
-	#print "#{current} "
-	(0..19).each do
-		if (mcw current) != nil
-			#print "#{mcw current} "
-			created_title += " #{mcw current}"
-			current = (mcw current)
-		end # if mcw str != nil
-	end # do 0..20
-	return created_title
+def create_title str	# Creates a 20 string title using the mcw function
+	current = str	# The current string
+	created_title = "#{current}"	# String being created
+	if (mcw current) != nil	# As long as the mcw exists for the current word
+		(0..19).each do 	# Do 20 times
+			created_title += " #{mcw current}"	# Add the mcw to the end of the created_title string
+			current = (mcw current)	# Get the next mcw
+		end # do 0..20
+	end # if mcw str != nil
+	return created_title	# Return result
 end # create_title str
 
 # Executes the program
@@ -122,12 +120,19 @@ def main_loop()
 
 	#puts "The most common word to follow 'happy' is '#{mcw("happy")}'"
 	#puts "The most common word to follow 'sad' is '#{mcw("sad")}'"
+	#puts "The most common word to follow 'computer' is '#{mcw("computer")}'"
+	#puts "The word 'computer' has #{$bigrams['computer'].count} unique words that follow it"
 	#puts "The most common word to follow 'love' is '#{mcw("love")}'"
-	#user = gets.chomp!
-	puts create_title("happy")
-
+	#puts create_title("happy")
+	#puts $counter
 
 	# Get user input
+
+	print "Enter a word [Enter 'q' to quit]: "
+	while (user = STDIN.gets.chomp) != 'q'
+		puts create_title(user)
+		print "Enter a word [Enter 'q' to quit]: "
+	end
 end
 
 main_loop()
