@@ -13,6 +13,7 @@ $bigrams = Hash.new # The Bigram data structure
 $name = "Drew Beck" # Me
 $counter = 0	# Tracks each time a new valid song title is processes in the bigram
 $stop_words = ["a", "an", "and", "by", "for", "from", "in", "of", "on", "or", "out", "the", "to", "with"]
+$nil_probability = 0
 
 # Function to process each line of a file and extract the song titles
 def process_file(file_name)
@@ -109,17 +110,22 @@ def get_random_word str
 	return ""
 end # get_next_word str
 
-def create_random_title str	# Creates a 20 string title using the mcw function
+def create_better_title str	# Creates a 20 string title using the mcw function
+	$nil_probability = 0
 	current = str	# The current string
 	created_title = "#{current}"	# String being created
 	if (get_random_word current) != nil	# As long as the mcw exists for the current word
-		(0..18).each do 	# Do until it stops
+		while 0 	# Do until it stops
 			created_title += " #{get_random_word current}"	# Add the mcw to the end of the created_title string
 			current = (get_random_word current)	# Get the next mcw
+			if $nil_probability > 1
+				current = nil
+			end # if $nil_probability > 0.8
 			if current == nil
 				break
 			end # end if current == nil
-		end # while TRUE
+			$nil_probability += rand
+		end # while 0
 	end # if mcw str != nil
 	return created_title	# Return result
 end # create_title str
