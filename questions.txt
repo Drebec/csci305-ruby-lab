@@ -1,11 +1,11 @@
 Your name
 CSCI-305
 
-10.
+10. The main problem I see is certain words trigger infinite loops. I see phrases like 'you are' and 'little girl in the world is a' repeated a lot.
 
-14.
+14. The titles devolve in to repeating patterns a lot because there are some words or phrases which are commonly followed by a word which is then followed by the same word or phrase again. All it takes is one word in the repeating phrase to be reached by other means and the algorithm is stuck forever.
 
-15.
+15. The seed word 'montana' results in the title 'montana sacra nova scotia' which terminates in four words.
 
 16.
 
@@ -13,12 +13,12 @@ CSCI-305
 
 20.
 
-21.
+21. I like how open Ruby feels. It gives the programmer a lot of liberties to do things their own way. There is no "right" or "wrong" way to do anything, there's just a more "Ruby" way to do things. If you don't like that or it isn't your style, chances are there's another, equally valid option to choose.
 
-22.
+22. Sometimes I don't like how open Ruby feels. While it is a very flexible language, there's just that many more opportunities for errors due to inexperience.
 
-23.
+23. I did enjoy this lab. It was a really good introduction to using regular expressions at a basic "match and replace" level. The only issues I had with this lab seemed to arise from problems Windows was having with text encodings or file parsing.
 
-24.
+24. 20 - 25 hours.
 
-25.
+25. I would use ruby again for a project which involves file parsing. I have done similar projects to this in the past in other languages like Python, and doing it in ruby with regular expressions was much easier.
