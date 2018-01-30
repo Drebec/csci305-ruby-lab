@@ -107,7 +107,7 @@ def get_random_word str
 		index = rand(len)
 		return keys[index]
 	end
-	return ""
+	return nil
 end # get_next_word str
 
 def create_better_title str	# Creates a 20 string title using the mcw function
@@ -167,7 +167,7 @@ def main_loop()
 
 	print "Enter a word [Enter 'q' to quit]: "
 	while (user = STDIN.gets.chomp) != 'q'
-		puts create_title(user)
+		puts create_better_title(user)
 		print "Enter a word [Enter 'q' to quit]: "
 	end
 end

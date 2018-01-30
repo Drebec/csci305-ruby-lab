@@ -1,4 +1,4 @@
-Your name
+Drew Beck
 CSCI-305
 
 10. The main problem I see is certain words trigger infinite loops. I see phrases like 'you are' and 'little girl in the world is a' repeated a lot.
@@ -7,11 +7,15 @@ CSCI-305
 
 15. The seed word 'montana' results in the title 'montana sacra nova scotia' which terminates in four words.
 
-16.
+16. My extension uses two new functions to generate the song titles. The first is get_random_word(str), which returns a random word from the list of all words to follow str in the $bigrams structure. If str has no following words, it returns nil. Every word in the list has an equal chance of being chosen by this function. The second function is create_better_title(str), which creates the title using the input str and the get_random_word function. Create_better_title uses a global variable $nil_probability to control title length. After each iteration of selecting the next word, $nil_probability is compared to one, and if it is greater than one, it sets the value of the next argument to get_random_word to nil. A nil argument to get_random_word will also return nil, and if the result of get_random_word is nil, create_better_title will terminate and return the song title created up to that point. By adjusting the value $nil_probability is compared to, the approximate length of the song title can be controlled. Due to the randomness of this algorithm, song titles are fairly random string, and have a random variable length.
 
-19.
+17. Starting with 'montana' I get the title 'montana moon da desert'.
 
-20.
+18. Starting with 'bob' I get the title 'bob song boyz blood stuff'.
+
+19. Starting with 'bob' again I get the title 'bob is montana's last'. And again I get 'bob chao river bill'. These titles are different each time because the algorithm is randomly choosing words and randomly deciding when to terminate.
+
+20. My favorite song title is 'song sirenes sunset wind worship' because of the alliteration.
 
 21. I like how open Ruby feels. It gives the programmer a lot of liberties to do things their own way. There is no "right" or "wrong" way to do anything, there's just a more "Ruby" way to do things. If you don't like that or it isn't your style, chances are there's another, equally valid option to choose.
 
