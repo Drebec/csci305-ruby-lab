@@ -60,7 +60,7 @@ def build_bigram title	# Populates the $bigrams hash
 		title.downcase!	# Reduce case of title
 		$counter += 1	# A new valid song title is being processed
 		words = title.split(' ')	# Separate words
-		words -= $stop_words
+		words -= $stop_words	# Remove stop words from the list of words
 		if words.length != 1
 			index = 0	# Tracks the index of the current word. Used to ignore the last word of every song
 			words.each do |word|	# For each word
@@ -100,8 +100,8 @@ def mcw str	# Returns the most common word to follow the input str
 	end # begin
 end # def mcw str
 
-def get_random_word str
-	if $bigrams[str] != nil
+def get_random_word str	# Returns a random word that follows str in $bigrams
+	if $bigrams[str] != nil	# If the input is nil, return nil
 		len = $bigrams[str].keys.length
 		keys = $bigrams[str].keys
 		index = rand(len)
